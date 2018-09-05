@@ -40,8 +40,45 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 */
 		public function __invoke( $args, $assoc_args ) {
 			$arguments = $this->parse_arguments( $args );
+			$this->create_new_folder( $arguments );
+			$this->copy_theme_files( $arguments );
+
 			print_r($arguments);
 		}
+
+		/**
+		 * Copies theme files from the old folder to the new folder.
+		 *
+		 * @param  array $arguments The arguments.
+		 * @return void.
+		 */
+		private function copy_theme_files( $arguments ) {
+			$path_to_new_folder = $arguments['path-to-new-folder'];
+			$mask_to_old_folder = $arguments['path-to-old-folder'] . '/*';
+
+			passthru( "cp -Rf $mask_to_old_folder $path_to_new_folder", $result );
+
+			if ( ( 0 !== $result ) ) {
+				WP_CLI::error( 'Cannot copy old files to new folder: ' . $path_to_new_folder );
+			}
+		}
+
+		/**
+		 * Creates a new folder.
+		 *
+		 * @param  array $arguments The arguments.
+		 * @return void.
+		 */
+		private function create_new_folder( $arguments ) {
+			$path_to_new_folder = $arguments['path-to-new-folder'];
+
+			passthru( "mkdir $path_to_new_folder", $result );
+
+			if ( ( 0 !== $result ) ) {
+				WP_CLI::error( 'Cannot create new folder: ' . $path_to_new_folder );
+			}
+		}
+
 
 		/**
 		 * Parse arguments
@@ -52,23 +89,23 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		private function parse_arguments( $args ) {
 			if ( $this->arguments_empty( $args ) ) {
 				WP_CLI::error( 'Argument cannot be empty' );
-				return;
 			}
 
 			if ( ! $this->theme_exists( $args[0] ) ) {
 				WP_CLI::error( 'Old theme cannot be found' );
-				return;
 			}
 
 			$theme = wp_get_theme( $args[0] );
 
 			return array(
-				'path-to-theme'  => $theme->theme_root . '/' . $args[0],
-				'old-name'       => $theme->get( 'Name' ),
-				'old-textdomain' => $theme->get( 'TextDomain' ),
-				'old-slug'       => $args[0],
-				'slug'           => $args[1],
-				'name'           => $args[2],
+				'path-to-theme'      => $theme->theme_root,
+				'path-to-new-folder' => $theme->theme_root . '/' . $args[1],
+				'path-to-old-folder' => $theme->theme_root . '/' . $args[0],
+				'old-name'           => $theme->get( 'Name' ),
+				'old-textdomain'     => $theme->get( 'TextDomain' ),
+				'old-slug'           => $args[0],
+				'slug'               => $args[1],
+				'name'               => $args[2],
 			);
 		}
 
