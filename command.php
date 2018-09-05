@@ -122,9 +122,11 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 				'path-to-old-folder' => $theme->theme_root . '/' . $args[0],
 				'old-name'           => $theme->get( 'Name' ),
 				'old-textdomain'     => $theme->get( 'TextDomain' ),
+				'old-packagename'    => $this->camelize( $theme->get( 'Name' ), ' ' ),
 				'old-slug'           => $args[0],
 				'slug'               => $args[1],
 				'name'               => $args[2],
+				'packagename'        => $this->camelize( $args[2], ' ' ),
 			);
 		}
 
@@ -153,6 +155,10 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 			}
 
 			return false;
+		}
+
+		private function camelize( $input, $separator = '_' ) {
+			return str_replace( $separator, '', ucwords( $input, $separator ) );
 		}
 	}
 
