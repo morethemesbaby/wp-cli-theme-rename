@@ -9,7 +9,7 @@ if ( ! class_exists( 'WP_CLI' ) ) {
  *
  * @when before_wp_load
  */
-$hello_world_command = function() {
-	WP_CLI::success( "Hello world." );
+$theme_rename_command = function() {
+	WP_CLI::success( "Theme rename." );
 };
-WP_CLI::add_command( 'hello-world', $hello_world_command );
+WP_CLI::add_command( 'theme-rename', $theme_rename_command );
