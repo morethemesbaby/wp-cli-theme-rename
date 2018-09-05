@@ -23,9 +23,6 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 * <old-slug>
 		 * : The slug of the old theme
 		 *
-		 * <old-name>
-		 * : The name of the old theme
-		 *
 		 * <slug>
 		 * : The new theme slug
 		 *
@@ -34,7 +31,7 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 *
 		 * ## EXAMPLE
 		 *
-		 *  $ wp theme-rename old-theme 'Old Theme' new-theme 'New Theme'
+		 *  $ wp theme-rename old-theme new-theme 'New Theme'
 		 *
 		 * @when after_wp_load
 		 *
@@ -43,6 +40,7 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 */
 		public function __invoke( $args, $assoc_args ) {
 			$arguments = $this->parse_arguments( $args );
+			print_r($arguments);
 		}
 
 		/**
@@ -52,17 +50,37 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 * @return array       The arguments parsed.
 		 */
 		private function parse_arguments( $args ) {
-			if ( $this->check_for_empty_arguments( $args ) ) {
+			if ( $this->arguments_empty( $args ) ) {
 				WP_CLI::error( 'Argument cannot be empty' );
 				return;
 			}
 
+			if ( ! $this->theme_exists( $args[0] ) ) {
+				WP_CLI::error( 'Old theme cannot be found' );
+				return;
+			}
+
+			$theme = wp_get_theme( $args[0] );
+
 			return array(
-				'old-slug' => $args[0],
-				'old-name' => $args[1],
-				'slug'     => $args[2],
-				'name'     => $args[3],
+				'path-to-theme'  => $theme->theme_root . '/' . $args[0],
+				'old-name'       => $theme->get( 'Name' ),
+				'old-textdomain' => $theme->get( 'TextDomain' ),
+				'old-slug'       => $args[0],
+				'slug'           => $args[1],
+				'name'           => $args[2],
 			);
+		}
+
+		/**
+		 *  Check if a theme exists.
+		 *
+		 * @param string $theme_slug The theme slug.
+		 * @return boolval           If the theme exists.
+		 */
+		private function theme_exists( $theme_slug ) {
+			$theme = wp_get_theme( $theme_slug );
+			return $theme->exists();
 		}
 
 		/**
@@ -71,7 +89,7 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 * @param  array $args The arguments.
 		 * @return boolval     If an argument is empty
 		 */
-		private function check_for_empty_arguments( $args ) {
+		private function arguments_empty( $args ) {
 			foreach ( $args as $arg ) {
 				if ( empty( $arg ) ) {
 					return true;
