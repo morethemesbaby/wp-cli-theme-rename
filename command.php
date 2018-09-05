@@ -40,10 +40,30 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 */
 		public function __invoke( $args, $assoc_args ) {
 			$arguments = $this->parse_arguments( $args );
-			$this->create_new_folder( $arguments );
-			$this->copy_theme_files( $arguments );
 
-			print_r($arguments);
+			print_r( $arguments );
+
+			//$this->create_new_folder( $arguments );
+			//$this->copy_theme_files( $arguments );
+			//$this->replace_theme_name( $arguments );
+
+			WP_CLI::success( 'All done' );
+		}
+
+		private function replace_theme_name( $arguments ) {
+			$path_to_new_folder = $arguments['path-to-new-folder'];
+			$old_theme_name     = $arguments['old-name'];
+			$new_theme_name     = $arguments['name'];
+			echo "string" . $old_theme_name . '>' . $new_theme_name;
+
+			$extensions = array(
+				'*.scss',
+				'*.php',
+			);
+
+			foreach ( $extensions as $extension ) {
+				$result = `cd {$path_to_new_folder} && find . -type f -name "{$extension}" -exec sed -i '' -e 's/{$old_theme_name}/{$new_theme_name}/g' {} +`;
+			}
 		}
 
 		/**
@@ -78,7 +98,6 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 				WP_CLI::error( 'Cannot create new folder: ' . $path_to_new_folder );
 			}
 		}
-
 
 		/**
 		 * Parse arguments
