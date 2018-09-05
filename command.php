@@ -41,29 +41,58 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		public function __invoke( $args, $assoc_args ) {
 			$arguments = $this->parse_arguments( $args );
 
-			print_r( $arguments );
+			//print_r( $arguments );
 
-			//$this->create_new_folder( $arguments );
-			//$this->copy_theme_files( $arguments );
-			//$this->replace_theme_name( $arguments );
+			$this->create_new_folder( $arguments );
+			$this->copy_theme_files( $arguments );
+			$this->replace_texts( $arguments );
 
 			WP_CLI::success( 'All done' );
 		}
 
-		private function replace_theme_name( $arguments ) {
+		private function replace_texts( $arguments ) {
 			$path_to_new_folder = $arguments['path-to-new-folder'];
-			$old_theme_name     = $arguments['old-name'];
-			$new_theme_name     = $arguments['name'];
-			echo "string" . $old_theme_name . '>' . $new_theme_name;
 
-			$extensions = array(
-				'*.scss',
-				'*.php',
+			$replacements = array(
+				array(
+					$arguments['old-packagename'],
+					$arguments['packagename'],
+				),
+				array(
+					$arguments['old-textdomain'],
+					$arguments['slug'],
+				),
+				array(
+					$arguments['old-name'],
+					$arguments['name'],
+				),
 			);
 
+			$extensions = array(
+				'*.php',
+				'*.scss',
+				'*.txt',
+				'*.md',
+			);
+
+			$old_value = $arguments['old-packagename'];
+			$new_value = $arguments['packagename'];
+			WP_CLI::log( "Replacing $old_value with $new_value in $path_to_new_folder" );
+			$result    = `cd {$path_to_new_folder} && find . -type f -name "*.php" -exec sed -i '' -e 's/{$old_value}/{$new_value}/g' {} +`;
+
+
+			/*
 			foreach ( $extensions as $extension ) {
-				$result = `cd {$path_to_new_folder} && find . -type f -name "{$extension}" -exec sed -i '' -e 's/{$old_theme_name}/{$new_theme_name}/g' {} +`;
+				foreach ( $replacements as $replacement ) {
+					$old_value = $replacement[0];
+					$new_value = $replacement[1];
+
+					echo "string: $extension > $old_value > $new_value \n\r";
+
+					$result    = `cd {$path_to_new_folder} && find . -type f -name "{$extension}" -exec sed -i '' -e 's/{$old_value}/{$new_value}/g' {} +`;
+				}
 			}
+			*/
 		}
 
 		/**
