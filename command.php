@@ -20,8 +20,11 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 *
 		 * ## OPTIONS
 		 *
-		 * <path-to-old-theme>
-		 * : The path to the old theme
+		 * <old-slug>
+		 * : The slug of the old theme
+		 *
+		 * <old-name>
+		 * : The name of the old theme
 		 *
 		 * <slug>
 		 * : The new theme slug
@@ -31,7 +34,7 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 *
 		 * ## EXAMPLE
 		 *
-		 *  $ wp theme-rename wp-content/themes/old-theme new-theme 'New Theme'
+		 *  $ wp theme-rename old-theme 'Old Theme' new-theme 'New Theme'
 		 *
 		 * @when after_wp_load
 		 *
@@ -39,29 +42,43 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 * @param array $assoc_args Optional arguments.
 		 */
 		public function __invoke( $args, $assoc_args ) {
-			$path_to_old_theme = $args[0];
-			$slug              = $args[1];
-			$name              = $args[2];
-
-			if ( empty( $path_to_old_theme ) || empty( $slug ) || empty( $name ) ) {
-				WP_CLI::error( 'No argument should be empty.' );
-				return;
-			}
-
-			$arguments = $this->parse_arguments( $path_to_old_theme, $slug, $name );
+			$arguments = $this->parse_arguments( $args );
 		}
 
 		/**
 		 * Parse arguments
 		 *
-		 * @param  string $path_to_old_theme Path to the old theme.
-		 * @param  string $slug              The new theme slug.
-		 * @param  string $name              The new theme name.
-		 * @return array                    The arguments parsed.
+		 * @param  array $args The arguments.
+		 * @return array       The arguments parsed.
 		 */
-		private function parse_arguments( $path_to_old_theme, $slug, $name ) {
-			$ret = [];
-			return $ret;
+		private function parse_arguments( $args ) {
+			if ( $this->check_for_empty_arguments( $args ) ) {
+				WP_CLI::error( 'Argument cannot be empty' );
+				return;
+			}
+
+			return array(
+				'old-slug' => $args[0],
+				'old-name' => $args[1],
+				'slug'     => $args[2],
+				'name'     => $args[3],
+			);
+		}
+
+		/**
+		 * Check fo empty arguments.
+		 *
+		 * @param  array $args The arguments.
+		 * @return boolval     If an argument is empty
+		 */
+		private function check_for_empty_arguments( $args ) {
+			foreach ( $args as $arg ) {
+				if ( empty( $arg ) ) {
+					return true;
+				}
+			}
+
+			return false;
 		}
 	}
 
