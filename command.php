@@ -41,7 +41,7 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		public function __invoke( $args, $assoc_args ) {
 			$arguments = $this->parse_arguments( $args );
 
-			//print_r( $arguments );
+			print_r( $arguments );
 
 			$this->create_new_folder( $arguments );
 			$this->copy_theme_files( $arguments );
@@ -68,31 +68,25 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 				),
 			);
 
-			$extensions = array(
-				'*.php',
-				'*.scss',
-				'*.txt',
-				'*.md',
-			);
 
-			$old_value = $arguments['old-packagename'];
-			$new_value = $arguments['packagename'];
-			WP_CLI::log( "Replacing $old_value with $new_value in $path_to_new_folder" );
-			$result    = `cd {$path_to_new_folder} && find . -type f -name "*.php" -exec sed -i '' -e 's/{$old_value}/{$new_value}/g' {} +`;
+			///
+			/// 1. run the commands from the cli, make sure they work
+			/// 2. then collect them into this function
+			/// 
 
+			// https://stackoverflow.com/questions/15920276/find-and-replace-string-in-all-files-recursive-using-grep-and-sed
+			foreach ( $replacements as $replacement ) {
+				$old_value = $replacement[0];
+				$new_value = $replacement[1];
 
-			/*
-			foreach ( $extensions as $extension ) {
-				foreach ( $replacements as $replacement ) {
-					$old_value = $replacement[0];
-					$new_value = $replacement[1];
+				WP_CLI::log( "Replacing $old_value with $new_value in $path_to_new_folder" );
 
-					echo "string: $extension > $old_value > $new_value \n\r";
+				passthru( "cd {$path_to_new_folder} && grep -rl {$old_value} . | xargs sed -i s@{$old_value}@{$new_value}@g", $result );
 
-					$result    = `cd {$path_to_new_folder} && find . -type f -name "{$extension}" -exec sed -i '' -e 's/{$old_value}/{$new_value}/g' {} +`;
+				if ( ( 0 !== $result ) ) {
+					WP_CLI::error( 'Renaming text error' );
 				}
 			}
-			*/
 		}
 
 		/**
