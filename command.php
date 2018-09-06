@@ -58,6 +58,29 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 * @return void
 		 */
 		private function rename_files( $arguments ) {
+			$path_to_new_folder = $arguments['path-to-new-folder'];
+
+			$folders = array(
+				'assets/images',
+				'assets/js',
+				'inc',
+				'languages',
+				'template-parts',
+			);
+
+			$old_value = $arguments['old-textdomain'];
+			$new_value = $arguments['new-textdomain'];
+
+			foreach ( $folders as $folder ) {
+				WP_CLI::log( "Renaming filenames from $old_value to $new_value in $path_to_new_folder/$folder" );
+
+				passthru( "cd {$path_to_new_folder} && find {$folder}/. -type f -exec rename 's/{$old_value}/{$new_value}/' {} \;", $result );
+
+				if ( ( 0 !== $result ) ) {
+					WP_CLI::error( 'Renaming file error' );
+				}
+			}
+
 			//find inc/. -type f -exec rename 's/log-lolla-pro/new-theme/' {} \;
 		}
 
