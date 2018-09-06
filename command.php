@@ -23,15 +23,15 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 * <old-slug>
 		 * : The slug of the old theme
 		 *
-		 * <slug>
+		 * <new-slug>
 		 * : The new theme slug
 		 *
-		 * <name>
+		 * <new-name>
 		 * : The new theme name
 		 *
 		 * ## EXAMPLE
 		 *
-		 *  $ wp theme-rename old-theme new-theme 'New Theme'
+		 *   $ wp theme-rename old-theme new-theme 'New Theme'
 		 *
 		 * @when after_wp_load
 		 *
@@ -45,7 +45,7 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 
 			$this->create_new_folder( $arguments );
 			$this->copy_theme_files( $arguments );
-			$this->replace_texts( $arguments );
+			//$this->replace_texts( $arguments );
 
 			WP_CLI::success( 'All done' );
 		}
@@ -56,15 +56,15 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 			$replacements = array(
 				array(
 					$arguments['old-packagename'],
-					$arguments['packagename'],
+					$arguments['new-packagename'],
 				),
 				array(
 					$arguments['old-textdomain'],
-					$arguments['slug'],
+					$arguments['new-slug'],
 				),
 				array(
 					$arguments['old-name'],
-					$arguments['name'],
+					$arguments['new-name'],
 				),
 			);
 
@@ -72,7 +72,7 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 			///
 			/// 1. run the commands from the cli, make sure they work
 			/// 2. then collect them into this function
-			/// 
+			///
 
 			// https://stackoverflow.com/questions/15920276/find-and-replace-string-in-all-files-recursive-using-grep-and-sed
 			foreach ( $replacements as $replacement ) {
@@ -147,9 +147,9 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 				'old-textdomain'     => $theme->get( 'TextDomain' ),
 				'old-packagename'    => $this->camelize( $theme->get( 'Name' ), ' ' ),
 				'old-slug'           => $args[0],
-				'slug'               => $args[1],
-				'name'               => $args[2],
-				'packagename'        => $this->camelize( $args[2], ' ' ),
+				'new-slug'           => $args[1],
+				'new-name'           => $args[2],
+				'new-packagename'    => $this->camelize( $args[2], ' ' ),
 			);
 		}
 
@@ -180,6 +180,13 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 			return false;
 		}
 
+		/**
+		 * Camelizes a string.
+		 *
+		 * @param  string $input     The string.
+		 * @param  string $separator What seperates the words in the string.
+		 * @return string            The CamelCase version of the string.
+		 */
 		private function camelize( $input, $separator = '_' ) {
 			return str_replace( $separator, '', ucwords( $input, $separator ) );
 		}
