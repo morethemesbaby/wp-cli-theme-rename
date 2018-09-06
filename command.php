@@ -46,10 +46,28 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 			$this->create_new_folder( $arguments );
 			$this->copy_theme_files( $arguments );
 			$this->replace_texts( $arguments );
+			$this->rename_files( $arguments );
 
 			WP_CLI::success( 'All done' );
 		}
 
+		/**
+		 * Renames files.
+		 *
+		 * @param  array $arguments The arguments.
+		 * @return void
+		 */
+		private function rename_files( $arguments ) {
+			//find inc/. -type f -exec rename 's/log-lolla-pro/new-theme/' {} \;
+		}
+
+		/**
+		 * Replaces texts in files.
+		 *
+		 * @link https://stackoverflow.com/questions/15920276/find-and-replace-string-in-all-files-recursive-using-grep-and-sed
+		 * @param  array $arguments The arguments.
+		 * @return void
+		 */
 		private function replace_texts( $arguments ) {
 			$path_to_new_folder = $arguments['path-to-new-folder'];
 
@@ -72,16 +90,6 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 				),
 			);
 
-
-			///
-			/// 1. run the commands from the cli, make sure they work
-			/// 2. then collect them into this function
-			///
-			/// grep -rl "Log Lolla Pro" . | xargs sed -i "s@Log Lolla Pro@New Theme@g"
-			/// find inc/. -type f -exec rename 's/log-lolla-pro/new-theme/' {} \;
-			///
-
-			// https://stackoverflow.com/questions/15920276/find-and-replace-string-in-all-files-recursive-using-grep-and-sed
 			foreach ( $replacements as $replacement ) {
 				$old_value = $replacement[0];
 				$new_value = $replacement[1];
@@ -192,17 +200,6 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 			}
 
 			return false;
-		}
-
-		/**
-		 * Camelizes a string.
-		 *
-		 * @param  string $input     The string.
-		 * @param  string $separator What seperates the words in the string.
-		 * @return string            The CamelCase version of the string.
-		 */
-		private function camelize( $input, $separator = '_' ) {
-			return str_replace( $separator, '', ucwords( $input, $separator ) );
 		}
 	}
 
