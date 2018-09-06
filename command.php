@@ -47,8 +47,21 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 			$this->copy_theme_files( $arguments );
 			$this->replace_texts( $arguments );
 			$this->rename_files( $arguments );
+			$this->replace_shortcodes( $arguments );
 
 			WP_CLI::success( 'All done' );
+		}
+
+		/**
+		 * Replaces shorcodes.
+		 *
+		 * The replace is done inside page content, for example.
+		 *
+		 * @param array $arguments The arguments.
+		 * @return void
+		 */
+		private function replace_shortcodes( $arguments ) {
+			//
 		}
 
 		/**
@@ -80,8 +93,6 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 					WP_CLI::error( 'Renaming file error' );
 				}
 			}
-
-			//find inc/. -type f -exec rename 's/log-lolla-pro/new-theme/' {} \;
 		}
 
 		/**
