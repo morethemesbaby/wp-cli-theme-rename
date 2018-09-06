@@ -90,10 +90,6 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 				WP_CLI::log( "Renaming filenames from $old_value to $new_value in $path_to_new_folder/$folder" );
 
 				passthru( "cd {$path_to_new_folder} && find {$folder}/. -type f -exec rename 's/{$old_value}/{$new_value}/' {} \;", $result );
-
-				if ( ( 0 !== $result ) ) {
-					WP_CLI::error( 'Renaming file error' );
-				}
 			}
 		}
 
@@ -133,10 +129,6 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 				WP_CLI::log( "Replacing $old_value with $new_value in $path_to_new_folder" );
 
 				passthru( "cd {$path_to_new_folder} && grep -rl '{$old_value}' . | xargs sed -i 's@{$old_value}@{$new_value}@g'", $result );
-
-				if ( ( 0 !== $result ) ) {
-					WP_CLI::error( 'Renaming text error' );
-				}
 			}
 		}
 
