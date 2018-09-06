@@ -45,7 +45,7 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 
 			$this->create_new_folder( $arguments );
 			$this->copy_theme_files( $arguments );
-			//$this->replace_texts( $arguments );
+			$this->replace_texts( $arguments );
 
 			WP_CLI::success( 'All done' );
 		}
@@ -55,16 +55,20 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 
 			$replacements = array(
 				array(
+					$arguments['old-name'],
+					$arguments['new-name'],
+				),
+				array(
 					$arguments['old-packagename'],
 					$arguments['new-packagename'],
 				),
 				array(
-					$arguments['old-textdomain'],
-					$arguments['new-slug'],
+					$arguments['old-functionname'],
+					$arguments['new-functionname'],
 				),
 				array(
-					$arguments['old-name'],
-					$arguments['new-name'],
+					$arguments['old-textdomain'],
+					$arguments['new-textdomain'],
 				),
 			);
 
@@ -84,7 +88,7 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 
 				WP_CLI::log( "Replacing $old_value with $new_value in $path_to_new_folder" );
 
-				passthru( "cd {$path_to_new_folder} && grep -rl {$old_value} . | xargs sed -i s@{$old_value}@{$new_value}@g", $result );
+				passthru( "cd {$path_to_new_folder} && grep -rl '{$old_value}' . | xargs sed -i 's@{$old_value}@{$new_value}@g'", $result );
 
 				if ( ( 0 !== $result ) ) {
 					WP_CLI::error( 'Renaming text error' );
@@ -147,19 +151,19 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 			$theme = wp_get_theme( $args[0] );
 
 			return array(
-				'old-slug'            => $old_slug,
-				'new-slug'            => $new_slug,
-				'path-to-theme'       => $theme->theme_root,
-				'path-to-new-folder'  => $theme->theme_root . '/' . $new_slug,
-				'path-to-old-folder'  => $theme->theme_root . '/' . $old_slug,
-				'old-name'            => $theme->get( 'Name' ),
-				'old-textdomain'      => $theme->get( 'TextDomain' ),
-				'old-packagename'     => str_replace( ' ', '_', $theme->get( 'Name' ) ),
-				'old-functionname'    => str_replace( ' ', '_', $theme->get( 'TextDomain' ) ),
-				'new-name'            => $new_name,
-				'new-textdomain'      => str_replace( '-', '-', $new_slug ),
-				'new-packagename'     => str_replace( ' ', '_', $new_name ),
-				'new-functionname'    => str_replace( '-', '_', $new_slug ),
+				'old-slug'           => $old_slug,
+				'new-slug'           => $new_slug,
+				'path-to-theme'      => $theme->theme_root,
+				'path-to-new-folder' => $theme->theme_root . '/' . $new_slug,
+				'path-to-old-folder' => $theme->theme_root . '/' . $old_slug,
+				'old-name'           => $theme->get( 'Name' ),
+				'old-textdomain'     => $theme->get( 'TextDomain' ),
+				'old-packagename'    => str_replace( ' ', '_', $theme->get( 'Name' ) ),
+				'old-functionname'   => str_replace( '-', '_', $theme->get( 'TextDomain' ) ),
+				'new-name'           => $new_name,
+				'new-textdomain'     => str_replace( '-', '-', $new_slug ),
+				'new-packagename'    => str_replace( ' ', '_', $new_name ),
+				'new-functionname'   => str_replace( '-', '_', $new_slug ),
 			);
 		}
 
