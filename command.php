@@ -41,8 +41,6 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		public function __invoke( $args, $assoc_args ) {
 			$arguments = $this->parse_arguments( $args );
 
-			print_r( $arguments );
-
 			$this->create_new_folder( $arguments );
 			$this->copy_theme_files( $arguments );
 			$this->replace_texts( $arguments );
@@ -61,7 +59,11 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 		 * @return void
 		 */
 		private function replace_shortcodes( $arguments ) {
-			//
+			$old_value = $arguments['old-textdomain'];
+			$new_value = $arguments['new-textdomain'];
+
+			WP_CLI::warning( 'If there are shortcodes used please consider a database replace. ' );
+			WP_CLI::warning( "$ wp search-replace '{$old_value}' '{$new_value}'" );
 		}
 
 		/**
