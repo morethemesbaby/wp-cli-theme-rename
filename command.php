@@ -73,6 +73,9 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 			/// 1. run the commands from the cli, make sure they work
 			/// 2. then collect them into this function
 			///
+			/// grep -rl "Log Lolla Pro" . | xargs sed -i "s@Log Lolla Pro@New Theme@g"
+			/// find inc/. -type f -exec rename 's/log-lolla-pro/new-theme/' {} \;
+			///
 
 			// https://stackoverflow.com/questions/15920276/find-and-replace-string-in-all-files-recursive-using-grep-and-sed
 			foreach ( $replacements as $replacement ) {
@@ -133,23 +136,30 @@ if ( ! class_exists( 'WP_CLI_Theme_Rename_Command' ) ) {
 				WP_CLI::error( 'Argument cannot be empty' );
 			}
 
-			if ( ! $this->theme_exists( $args[0] ) ) {
+			$old_slug = $args[0];
+			$new_slug = $args[1];
+			$new_name = $args[2];
+
+			if ( ! $this->theme_exists( $old_slug ) ) {
 				WP_CLI::error( 'Old theme cannot be found' );
 			}
 
 			$theme = wp_get_theme( $args[0] );
 
 			return array(
-				'path-to-theme'      => $theme->theme_root,
-				'path-to-new-folder' => $theme->theme_root . '/' . $args[1],
-				'path-to-old-folder' => $theme->theme_root . '/' . $args[0],
-				'old-name'           => $theme->get( 'Name' ),
-				'old-textdomain'     => $theme->get( 'TextDomain' ),
-				'old-packagename'    => $this->camelize( $theme->get( 'Name' ), ' ' ),
-				'old-slug'           => $args[0],
-				'new-slug'           => $args[1],
-				'new-name'           => $args[2],
-				'new-packagename'    => $this->camelize( $args[2], ' ' ),
+				'old-slug'            => $old_slug,
+				'new-slug'            => $new_slug,
+				'path-to-theme'       => $theme->theme_root,
+				'path-to-new-folder'  => $theme->theme_root . '/' . $new_slug,
+				'path-to-old-folder'  => $theme->theme_root . '/' . $old_slug,
+				'old-name'            => $theme->get( 'Name' ),
+				'old-textdomain'      => $theme->get( 'TextDomain' ),
+				'old-packagename'     => str_replace( ' ', '_', $theme->get( 'Name' ) ),
+				'old-functionname'    => str_replace( ' ', '_', $theme->get( 'TextDomain' ) ),
+				'new-name'            => $new_name,
+				'new-textdomain'      => str_replace( '-', '-', $new_slug ),
+				'new-packagename'     => str_replace( ' ', '_', $new_name ),
+				'new-functionname'    => str_replace( '-', '_', $new_slug ),
 			);
 		}
 
